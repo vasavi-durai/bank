@@ -4,13 +4,12 @@ const User = require('../models/user');
 exports.getByaccNo = async (req, res) => {
     try {
         const { accNo, username } = req.query;
-        if (!accNo && !username) 
-        {
+        if (!accNo && !username) {
             return res.status(400).json({ message: 'Please provide either an account number or a username.' });
         }
         let user;
         if (accNo) {
-           
+
             user = await User.findOne({ accNo });
             if (!user) {
                 return res.status(404).json({ message: 'User not found.' });
@@ -19,7 +18,7 @@ exports.getByaccNo = async (req, res) => {
 
             const updatedTransactions = [];
             userTransactions.forEach(transaction => {
-              updatedTransactions.push({
+                updatedTransactions.push({
                     dateTime: transaction.dateTime,
                     type: transaction.type,
                     amount: transaction.amount,
@@ -34,7 +33,7 @@ exports.getByaccNo = async (req, res) => {
                 }
             });
         }
-     if (username) {
+        if (username) {
             if (!isNaN(username)) {
                 return res.status(400).json({ message: 'Username must contain only alphabets.' });
             }
