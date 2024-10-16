@@ -1,18 +1,19 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const connectDB = require('./config/db');
- const transactionRouter = require('./routes/transaction');
-const userRouter = require('./routes/user');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const routertransact = require('./routes/transaction');
+const routeruser = require('./routes/user');
+const connectDB = require('./config/db');
 
 connectDB();
- 
-app.use(bodyParser.json());
 
- app.use('/api/transact', transactionRouter);
-app.use('/api/users', userRouter);
+app.use(express.json()); 
 
-app.listen(PORT, () => {
+app.use('/api/v1', routertransact);
+app.use('/api/v1', routeruser);
+const PORT = process.env.PORT ;
+app.listen(PORT, ()=> 
+{
     console.log(`Server is running on http://localhost:${PORT}`);
-});
+}
+);
+

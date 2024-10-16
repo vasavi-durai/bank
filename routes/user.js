@@ -1,8 +1,7 @@
 var express = require('express');
 var router = express.Router();
-var {ucontrollercontroller} =require('../controller/usercontroller');
 
+const  {getByaccNo} = require('../controllers/usercontroller');
 
-router.post('/', ucontroller);
-
+router.get('/userdata', getByaccNo );
 module.exports = router;

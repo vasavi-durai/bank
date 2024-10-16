@@ -1,7 +1,6 @@
-var express = require('express');
+var express= require('express');
 var router = express.Router();
-var {getUserByAccno,getUserByUsername} =require('../controller/transactioncontroller');
 
-router.get('/', getUserByAccno);
-
+var transcontroller = require('../controllers/transactioncontroller');
+router.post('/transaction', transcontroller.transcontroller);
 module.exports = router;
