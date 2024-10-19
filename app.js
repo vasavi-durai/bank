@@ -3,13 +3,14 @@ const app = express();
 const routertransact = require('./routes/transaction');
 const routeruser = require('./routes/user');
 const connectDB = require('./config/db');
-
+const authrouter = require('./routes/auth');
 connectDB();
 
 app.use(express.json()); 
 
 app.use('/api/v1', routertransact);
 app.use('/api/v1', routeruser);
+app.use('/api/v1', authrouter);
 const PORT = process.env.PORT ;
 app.listen(PORT, ()=> 
 {
