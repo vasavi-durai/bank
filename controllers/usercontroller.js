@@ -23,6 +23,7 @@ exports.getByaccNo = async (req, res) => {
                     type: transaction.type,
                     amount: transaction.amount,
                     currentbalance: transaction.currentbalance,
+                    date:transaction.date
                 });
             });
             return res.status(200).json({

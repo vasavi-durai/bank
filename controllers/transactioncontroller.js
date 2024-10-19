@@ -37,15 +37,19 @@ exports.transcontroller = async (req, res) => {
         }
         user.currentbalance = currentbalance;
         await user.save();
+
+        const date = new Date();
+
         const transaction = new Transaction({
             user_id: user._id,
             type,
             amount,
             currentbalance: user.currentbalance,
-            createdAt: new Date(),
             username,
-            accNo
+            accNo,
+            date:date,
         });
+       
         await transaction.save();
         res.status(200).json({ message: "Transaction successful", transaction });
     } catch (error) {

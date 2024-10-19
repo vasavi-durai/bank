@@ -7,6 +7,7 @@ const transactionSchema = new mongoose.Schema({
     type: { type: String, enum: ['deposit', 'withdraw'], required: true },
     createdAt: { type: Date, default: Date.now },
     user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    date:{type:Date,default:Date.now}
     
     
 }
