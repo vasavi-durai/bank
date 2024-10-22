@@ -1,66 +1,65 @@
-
-const mongoose = require('mongoose');
-const User = require('../models/user');
+const jwt = require('jsonwebtoken');
+const Register = require('../models/authregister');
 const Transaction = require('../models/transaction');
-const Type_Transaction = {
-    deposit: 'deposit',
-    withdrawal: 'withdraw'
+const TRANSACTION_TYPES = {
+    DEPOSIT: 'deposit',
+    WITHDRAWAL: 'withdraw',
 };
 exports.transcontroller = async (req, res) => {
     try {
-        const { type, username, accNo, amount } = req.body;
-        if (!type || amount === undefined || !username || !accNo) {
-            return res.status(400).json({ message: "Please ensure you have all fields" });
+        const token = 
+            (req.cookies && req.cookies.token) || 
+            (req.headers['authentication'] ? req.headers['authentication'].split(' ')[1] : null);
+        if (!token) {
+            return res.status(401).json({ message: 'Authorisation token is required.' });
+        }
+        const secret = process.env.JWT_SECRET;
+        if (!secret) {
+            throw new Error('JWT_SECRET not defined.');
+        }
+        try {
+            decoded = jwt.verify(token, secret);
+        } catch (err) {
+            return res.status(401).json({ message: 'Invalid token.', error: err.message });
+        }
+        const user = await Register.findById(decoded.userId);
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid user.' });
+        }
+        const { type, amount } = req.body;
+        if (!type || !amount) {
+            return res.status(400).json({ message: 'Transaction type and amount are required.' });
         }
         if (typeof amount !== 'number' || amount <= 0) {
-            return res.status(400).json({ message: "Enter a Valid Amount" });
+            return res.status(400).json({ message: 'Amount must be a positive number.' });
         }
-        if (!accNo || accNo.length !== 10) {
-            return res.status(400).json({ message: "Enter a Valid Account Number" });
-        }
-        let user = await User.findOne({ accNo });
-        if (!user) {
-            return res.status(400).json({ message: "New Users are Not allowed to Withdraw or Deposit" });
-        }
-        let currentbalance = user.currentbalance;
-        if (type === Type_Transaction.deposit) {
+        let currentbalance = user.currentbalance || 0;
+        if (type === TRANSACTION_TYPES.DEPOSIT) {
             currentbalance += amount;
-        }
-        else if (type === Type_Transaction.withdrawal) {
+        } else if (type === TRANSACTION_TYPES.WITHDRAWAL) {
             if (currentbalance < amount) {
                 return res.status(400).json({ message: 'Insufficient balance.' });
-            } else {
-                currentbalance -= amount;
             }
+            currentbalance -= amount;
         } else {
             return res.status(400).json({ message: 'Invalid transaction type.' });
         }
         user.currentbalance = currentbalance;
         await user.save();
-
-        const date = new Date();
-
         const transaction = new Transaction({
             user_id: user._id,
             type,
             amount,
             currentbalance: user.currentbalance,
-            username,
-            accNo,
-            date:date,
+            date: new Date(),
         });
-       
         await transaction.save();
-        res.status(200).json({ message: "Transaction successful", transaction });
+        res.status(200).json({
+            message: type === TRANSACTION_TYPES.DEPOSIT ? 'Deposit successful!' : 'Withdrawal successful!',
+            transaction,
+        });
     } catch (error) {
         console.error('Transaction error:', error);
         res.status(500).json({ message: 'Internal server error.', error: error.message });
     }
 };
-
-
-
-
-
-
-
