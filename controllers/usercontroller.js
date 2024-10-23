@@ -36,9 +36,8 @@ exports.getByaccNo = async (req, res) => {
         }
         if (username) {
             if (!isNaN(username)) {
-                return res.status(400).json({ message: 'Username must contain only alphabets.' });
+                return res.status(400).json({ message:'Username must contain only alphabets.' });
             }
-
             user = await Register.findOne({ username });
             if (!user) {
                 return res.status(404).json({ message: 'User not found.' });
