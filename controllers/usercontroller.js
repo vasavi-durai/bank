@@ -1,5 +1,5 @@
 const Transaction = require('../models/transaction');
-const User = require('../models/user');
+const Register = require('../models/authregister');
 
 exports.getByaccNo = async (req, res) => {
     try {
@@ -10,7 +10,7 @@ exports.getByaccNo = async (req, res) => {
         let user;
         if (accNo) {
 
-            user = await User.findOne({ accNo });
+            user = await Register.findOne({ accNo });
             if (!user) {
                 return res.status(404).json({ message: 'User not found.' });
             }
@@ -19,11 +19,11 @@ exports.getByaccNo = async (req, res) => {
             const updatedTransactions = [];
             userTransactions.forEach(transaction => {
                 updatedTransactions.push({
-                    dateTime: transaction.dateTime,
+                    date: transaction.date,
                     type: transaction.type,
                     amount: transaction.amount,
                     currentbalance: transaction.currentbalance,
-                    date:transaction.date
+                    date:  transaction.date || transaction.createdAt
                 });
             });
             return res.status(200).json({
@@ -39,7 +39,7 @@ exports.getByaccNo = async (req, res) => {
                 return res.status(400).json({ message: 'Username must contain only alphabets.' });
             }
 
-            user = await User.findOne({ username });
+            user = await Register.findOne({ username });
             if (!user) {
                 return res.status(404).json({ message: 'User not found.' });
             }
